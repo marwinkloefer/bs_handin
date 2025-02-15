@@ -112,7 +112,7 @@ pub extern "C" fn kmain(mbi: u64) {
     let hello_world_thread = Thread::new(
         scheduler::next_thread_id(),
         hello_world_thread::hello_world_thread_entry,
-        true, //hier setzen welcher Ring Thread Hello World läuft Aufgabe 1
+        false, //hier setzen welcher Ring Thread Hello World läuft Aufgabe 1
     );
     scheduler::Scheduler::ready(hello_world_thread);
 

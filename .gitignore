@@ -3,3 +3,10 @@
 
 # Ignoriere alle .rustc_info.json-Dateien in den Aufgabenordnern
 **/*.rustc_info.json
+
+# Ignoriere alle .o, .a, .iso und andere Build-Dateien
+*.o
+*.a
+*.iso
+*.bin
+*.lock
