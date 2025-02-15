@@ -1,0 +1,19 @@
+[package]
+edition = "2018"
+name = "hhu_tosr"
+version = "0.1.0"
+authors = ["Michael Schöttner <michael.schoettner@hhu.de>"]
+
+[lib]
+crate-type = ["staticlib"]
+path = "src/startup.rs"
+
+[dependencies]
+spin = "0.9.8"
+nolock = { version = "0.4.1", default-features = false, features = ["queues"] }
+x86 = "0.52.0"
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["spin_no_std"]
+

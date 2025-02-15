@@ -1,0 +1,5 @@
+# Ignoriere alle target-Ordner in den Aufgabenordnern
+**/target/
+
+# Ignoriere alle .rustc_info.json-Dateien in den Aufgabenordnern
+**/*.rustc_info.json
