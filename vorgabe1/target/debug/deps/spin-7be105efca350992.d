@@ -1,0 +1,12 @@
+/mnt/c/Users/marwi/OneDrive/Dokumente/Uni/SemesterWi2425/1_Isolation und Schutz in Betriebssystemen/vorgabe1/target/debug/deps/libspin-7be105efca350992.rmeta: /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lib.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/barrier.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lazy.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex/spin.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/once.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/relax.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/rwlock.rs
+
+/mnt/c/Users/marwi/OneDrive/Dokumente/Uni/SemesterWi2425/1_Isolation und Schutz in Betriebssystemen/vorgabe1/target/debug/deps/spin-7be105efca350992.d: /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lib.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/barrier.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lazy.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex/spin.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/once.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/relax.rs /home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/rwlock.rs
+
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lib.rs:
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/barrier.rs:
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lazy.rs:
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex.rs:
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex/spin.rs:
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/once.rs:
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/relax.rs:
+/home/marwin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/rwlock.rs:
