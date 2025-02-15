@@ -56,6 +56,10 @@ args = [ "-f", "elf64", "-w+error=label-redef-late", "-o", "${BUILD_DIRECTORY}/i
 command = "nasm"
 args = [ "-f", "elf64", "-w+error=label-redef-late", "-o", "${BUILD_DIRECTORY}/thread.o", "${SOURCE_DIRECTORY}/kernel/threads/thread.asm" ]
 
+[tasks.build-syscall-asm]
+command = "nasm"
+args = [ "-f", "elf64", "-w+error=label-redef-late", "-o", "${BUILD_DIRECTORY}/syscalls.o", "${SOURCE_DIRECTORY}/kernel/syscall/syscalls.asm" ]
+
 # 
 # Linking 
 #
@@ -66,8 +70,8 @@ dependencies = [ "compile", "build-boot-asm", "build-interrupt-asm", "build-thre
 
 [tasks.link.linux]
 command = "${LINKER_LINUX}"
-args = [ "-n", "-T", "${LINKER_FILE}", "-o", "${KERNEL}", "${BUILD_DIRECTORY}/boot.o", "${BUILD_DIRECTORY}/interrupts.o", "${BUILD_DIRECTORY}/thread.o", "${RUST_OBJECT}" ]
-dependencies = [ "compile", "build-boot-asm", "build-interrupt-asm", "build-thread-asm" ]
+args = [ "-n", "-T", "${LINKER_FILE}", "-o", "${KERNEL}", "${BUILD_DIRECTORY}/boot.o", "${BUILD_DIRECTORY}/syscalls.o", "${BUILD_DIRECTORY}/interrupts.o", "${BUILD_DIRECTORY}/thread.o", "${RUST_OBJECT}" ]
+dependencies = [ "compile", "build-boot-asm", "build-interrupt-asm", "build-thread-asm", "build-syscall-asm" ]
 
 #
 # Bootloader tasks
@@ -75,6 +79,7 @@ dependencies = [ "compile", "build-boot-asm", "build-interrupt-asm", "build-thre
 [tasks.grub-create-directory]
 command = "mkdir"
 args = [ "-p", "${BUILD_DIRECTORY}/isofiles/boot/grub" ]
+
 
 [tasks.grub-copy-kernel]
 command = "cp"

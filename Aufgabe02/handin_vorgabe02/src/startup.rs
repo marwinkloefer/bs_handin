@@ -15,10 +15,12 @@
 #![allow(unused_imports)]
 #![allow(unused_macros)]
 #![feature(alloc_error_handler)]
+#![feature(naked_functions)]
 
 extern crate alloc;
 extern crate spin; // we need a mutex in devices::cga_print
 extern crate x86;
+extern crate bitflags;
 
 // insert other modules
 #[macro_use] // import macros, too
@@ -42,6 +44,7 @@ use devices::pit; // timer
 use kernel::allocator;
 use kernel::cpu;
 use kernel::interrupts;
+use kernel::syscall::syscall_dispatcher;
 use kernel::threads::idle_thread;
 use kernel::threads::scheduler;
 use kernel::threads::thread::Thread;
@@ -82,17 +85,21 @@ pub extern "C" fn kmain(mbi: u64) {
     kprintln!("kmain");
 
     let kernel_region = get_kernel_image_region();
-    kprintln!("   kernel_region: {:?}", kernel_region);
+    kprintln!("kmain, kernel_image: {:?}", kernel_region);
 
     // Speicherverwaltung (1 MB) oberhalb des Images initialisieren
     let heap_start = kernel_region.end as usize + 1;
     allocator::init(heap_start, consts::HEAP_SIZE);
 
-    // Multiboot-Infos ausgeben
+    // Dump multiboot infos
+    // mbi == multiboot address 
     multiboot::dump(mbi);
 
     // Interrupt-Strukturen initialisieren
     interrupts::init();
+
+    // Interrupt Descriptor Table an Stelle 0x80 Trap-Gate erstellen
+    syscall_dispatcher::init();
 
     // Tastatur-Unterbrechungsroutine 'einstoepseln'
     keyboard::Keyboard::plugin();

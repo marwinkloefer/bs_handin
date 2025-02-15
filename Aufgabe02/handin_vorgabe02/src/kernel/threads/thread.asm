@@ -118,7 +118,10 @@ _thread_switch:
 
 	retq               ; Thread-Wechsel !
 
-
+    ; Der User-Level-Stack-Zeiger muss nicht extra verwaltet werden, da er
+    ; automatisch durch die Hardware bei einem Thread-Wechsel gesichert wird. Der Thread-Wechsel erfolgt
+    ; nur aus dem Timer-Interrupt heraus und dafür wechselt der Prozessor automatisch von Ring 3 (Anwendung) nach Ring 0 (Kernel)
+    ; und sichert den Stack-Zeiger des unterbrochenen User-Level Threads auf dem Kernel-Stack.
 
 ;
 ; fn _thread_user_start (old_rsp0: u64); 

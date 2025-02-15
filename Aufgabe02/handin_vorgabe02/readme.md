@@ -1,11 +1,7 @@
-# Aufgabe 1
+# Aufgabe 2
 
-In der Datei **"\*\*/Abgabe/Aufgabe01/handin_vorgabe01/src/user/hello_world_thread.rs"** wird ein Portbefehl ausgeführt. (siehe: **let val = cpu::inb(1);**)
+Rufe in **hello_world_thread_entry()** die geschriebene funktion **test_syscalls(call_id: u8)** auf die basierend auf den eingabe Zahlen die einzelnen Syscalls testet. AKtuell ist 0 gestetzt was dazu führt, dass **sys_hello_world()** getestet wird.
 
-
-In der Datei **"\*\*/Abgabe/Aufgabe01/handin_vorgabe01src/startup.rs"** ist der hello_world_tread als User-Level-Thread gesetzt. (siehe: 'kernel_thread = false')
-
-=> User-Thread versucht Port-Befehl auszuführen => General Protection Fault => Läuft in Ring 3
 
 
 
@@ -17,9 +13,16 @@ preempt: tid=0, old_rsp0=481f30 and switch to tid=1, old_rsp0=581fa8
 
 kickoff_kernel_thread, tid=1, old_rsp0 = 581fa8, is_kernel_thread: false
 
-general protection fault: error_code = 0x0, cs:rip = 0x23:0x10b869
+preempt: tid=1, old_rsp0=581fa8 and switch to tid=0, old_rsp0=481a78
+
+preempt: tid=0, old_rsp0=481a78 and switch to tid=1, old_rsp0=581be8
+
+Hello World from user thread tid=1
+
+preempt: tid=1, old_rsp0=581be8 and switch to tid=0, old_rsp0=481a78
+
+preempt: tid=0, old_rsp0=481a78 and switch to tid=1, old_rsp0=581be8
+
+preempt: tid=1, old_rsp0=581be8 and switch to tid=0, old_rsp0=481a78
 
 """
-
-
-==> Läuft, wenn **let val = cpu::inb(1);** auskommentiert wird

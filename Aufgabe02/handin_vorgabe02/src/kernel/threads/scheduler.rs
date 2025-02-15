@@ -194,5 +194,4 @@ impl Scheduler {
         // Interrupts werden in Thread_switch in thread.asm wieder zugelassen
         //
     }
-
 }

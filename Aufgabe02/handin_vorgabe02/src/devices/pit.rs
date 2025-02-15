@@ -102,8 +102,8 @@ impl isr::ISR for PitISR {
             }
         }
         if !now.is_null() && !then.is_null() {
-         // everything worked, so now we switch
-         thread::Thread::switch(now, then);
-     }
-}
+            // everything worked, so now we switch
+            thread::Thread::switch(now, then);
+        }
+    }
 }

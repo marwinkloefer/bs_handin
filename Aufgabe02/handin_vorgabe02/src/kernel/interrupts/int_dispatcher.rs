@@ -167,8 +167,8 @@ fn print_exception(vector: u32) {
         10 => kprint!("invalid tss"),
         11 => kprint!("segment not present"),
         12 => kprint!("stack-segment fault"),
-        13 => kprint!("general protection fault"),
-        14 => kprint!("page fault"),
+        13 => kprint!("general protection fault"), // abgedeckt mit eigener funktion
+        14 => kprint!("page fault"), // abgedeckt mit eigener funkiton
         16 => kprint!("x87 floating-point exception"),
         17 => kprint!("alignment check"),
         18 => kprint!("machine check"),

@@ -124,26 +124,27 @@ impl From<u32> for MmapType {
 //
 pub fn get_free_memory(
     mbi_ptr: u64,
-    kernel_region: PhysRegion,
-    heap_region: PhysRegion,
+    kernel_region: PhysRegion,  //Region im speicher mit Start und End-Adresse
+    heap_region: PhysRegion,    //Region im speicher mit Start und End-Adresse
 ) -> Vec<PhysRegion> {
     let mut free: Vec<PhysRegion> = Vec::new();
     let mut reserved: Vec<PhysRegion> = Vec::new();
 
+    // Flag und Multiboot Info lesen
     let mb_info: &MultibootInfo = unsafe { MultibootInfo::read(mbi_ptr) };
     let flags = mb_info.flags;
 
-    // Informationen, welche Speicherbereiche genutzt werden koennen oder belegt sind
+    // Informationen, welche Speicherbereiche genutzt werden können oder belegt sind
     // sammeln und passend in den beiden Vec-Strukturen speichern
     // Wir speichern immer Tupel (Start-, End-Adresse)
     if flags & 0x40 != 0 {
         let mmap_length = mb_info.mmap_length;
-        let mmap_addr = mb_info.mmap_addr;
+        let mmap_addr = mb_info.mmap_addr; // Warum wird diese Variable gesetzt, wenn sie nicht verwendet wird???
 
         unsafe {
-            for i in 0..(mb_info.mmap_length / size_of::<MmapEntry>() as u32) {
-                let mmap_entry = &*((mb_info.mmap_addr as u64) as *const MmapEntry).add(i as usize);
-                let region = PhysRegion {
+            for i in 0..(mb_info.mmap_length / size_of::<MmapEntry>() as u32) { // Durchlaufe Bereich in Stücken der MmapEntry Größe
+                let mmap_entry = &*((mb_info.mmap_addr as u64) as *const MmapEntry).add(i as usize); // Bekomme Zeiger auf ites Element im Bereich 
+                let region = PhysRegion { // neue Region im speicher mit Start und End-Adresse implementieren
                     start: mmap_entry.addr,
                     end: mmap_entry.addr + mmap_entry.len - 1,
                 };
@@ -151,7 +152,7 @@ pub fn get_free_memory(
                 if mmap_entry.typ == 1 {
                     free.push(region);
                 } else {
-                    reserved.push(region);
+                    reserved.push(region); // gehen wir defensiv vor und behandeln mmap-Regionen-Speicherbereiche, die sich überlappen können oder sich widersprechen, als reserviert
                 }
             }
         }

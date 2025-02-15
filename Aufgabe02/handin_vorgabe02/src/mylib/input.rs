@@ -2,7 +2,6 @@ use crate::devices::keyboard;
 
 const KEY_LF: u8 = 10;
 const KEY_CR: u8 = 13;
- 
 
 pub fn getch() -> u8 {
     let mut k: u8;
