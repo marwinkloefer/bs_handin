@@ -1,0 +1,2 @@
+ #![feature(naked_functions)]
+
