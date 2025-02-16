@@ -35,7 +35,6 @@ use crate::kernel::allocator::list::PfListAllocator;
 
 // letzte nutzbare physikalische Adresse
 // (notwendig fuer das 1:1 mapping des Kernels in den Page-Tables)
-// TODO checken ob hier nicht dynamisch ausgelesen werden müsste in makefile.toml steht 256M
 static mut MAX_PHYS_ADDR: PhysAddr = PhysAddr(0);
 
 // Page-Frames > KERNEL_VM_SIZE

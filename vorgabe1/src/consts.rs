@@ -18,7 +18,7 @@ pub const TEMP_HEAP_SIZE: usize = 0x10_0000;
 // Seitengroesse = 4 KB
 pub const PAGE_SIZE: usize = 0x1000;
 
-// 1 MB Heap für das Einrichten des Systems (siehe 'kmain')
+// 1 MB Heap füsr das Einrichten des Systems (siehe 'kmain')
 pub const KERNEL_HEAP_SIZE: usize = 0x10_0000;
 
 // Kachelgroesse = 4 KB

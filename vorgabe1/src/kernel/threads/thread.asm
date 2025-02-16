@@ -93,11 +93,20 @@ _thread_kernel_start:
 _thread_switch:
     ; Register des aktuellen Threads auf dem Stack sichern
     pushf
+    push r8
+    push r9
+    push r10
+    push r11
     push r12
     push r13
     push r14
     push r15
+    push rax
     push rbx
+    push rcx
+    push rdx
+    push rsi
+    push rdi
     push rbp
     ; sichere Stackpointer in 'now_rsp0' (1. Param)
     mov [rdi], rsp     
@@ -111,20 +120,20 @@ _thread_switch:
     ; Stack umschalten mithilfe von 'then_rsp0' (2. Param.)
     mov rsp, rsi
     pop rbp
-    ;pop rdi
-    ;pop rsi
-    ;pop rdx
-    ;pop rcx
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
     pop rbx
-    ;pop rax
+    pop rax
     pop r15
     pop r14
     pop r13
     pop r12
-    ;pop r11
-    ;pop r10
-    ;pop r9
-    ;pop r8
+    pop r11
+    pop r10
+    pop r9
+    pop r8
     popf 
 
 	retq               ; Thread-Wechsel !
