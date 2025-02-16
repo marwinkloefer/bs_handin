@@ -56,8 +56,29 @@ _thread_kernel_start:
     retq
 
 
+
+
+
+    ;pushf
+    ;;push r8
+    ;;push r9
+    ;;push r10
+    ;;push r11
+    ;push r12
+    ;push r13
+    ;push r14
+    ;push r15
+    ;;push rax
+    ;push rbx
+    ;;push rcx
+    ;;push rdx
+    ;;push rsi
+    ;;push rdi
+    ;push rbp
+
+
 ;
-; fn _thread_switch (now_rsp0: *mut u64, then_rsp0: u64, then_rsp0_end: u64);
+; fn _thread_switch (now_rsp0: *mut u64, then_rsp0: u64, then_rsp0_end: u64, then_pml4: u64);
 ;    
 ; Umschalten zw. Threads
 ;
@@ -67,9 +88,9 @@ _thread_kernel_start:
 ;                      des Threads der die CPU nun bekommt. Benötigen wir um den 0
 ;                      Stack umzuschalten
 ;       then_rsp0_end: Erste benutzerbare Adresse des Kernel-Stacks von 'then_rsp0'
-;                      Wird benoetigt, um den RSP0-Eintrag im TSS zu aktualisieren          
+;                      Wird benoetigt, um den RSP0-Eintrag im TSS zu aktualisieren   
+;       then_pml4:     Adresse der pml4 Tabelle des then threads    
 _thread_switch:
-
     ; Register des aktuellen Threads auf dem Stack sichern
     pushf
     push r8
@@ -87,16 +108,15 @@ _thread_switch:
     push rsi
     push rdi
     push rbp
- 
     ; sichere Stackpointer in 'now_rsp0' (1. Param)
     mov [rdi], rsp     
-
+    ; aktualisieren pml4 address (4. Param, 'then_pml4')
+    mov rax, rcx
+    mov cr3, rax
     ; aktualisiere RSP0 (Kernel-Stack) im TSS (3. Param, 'then_rsp0_end')
     mov rdi, rdx
     call _tss_set_rsp0
-
     ; Register des naechsten Threads laden
-
     ; Stack umschalten mithilfe von 'then_rsp0' (2. Param.)
     mov rsp, rsi
     pop rbp

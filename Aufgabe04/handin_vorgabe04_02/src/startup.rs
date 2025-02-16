@@ -140,7 +140,7 @@ pub extern "C" fn kmain(mbi: u64) {
     interrupts::init();
 
     // Interrupt Descriptor Table an Stelle 0x80 Trap-Gate erstellen
-    //syscall_dispatcher::init();
+    syscall_dispatcher::init();
 
     // Tastatur-Unterbrechungsroutine 'einstoepseln'
     keyboard::Keyboard::plugin();
@@ -148,6 +148,7 @@ pub extern "C" fn kmain(mbi: u64) {
     // Zeitgeber-Unterbrechungsroutine 'einstoepseln'
     pit::plugin();
 
+    /* --------- old ---------
     // Idle-Thread eintragen
     let idle_thread = Thread::new(
         scheduler::next_thread_id(),
@@ -156,14 +157,29 @@ pub extern "C" fn kmain(mbi: u64) {
     );
     scheduler::Scheduler::ready(idle_thread);
 
-    /*// HelloWorld-Thread eintragen
+    // HelloWorld-Thread eintragen
     let hello_world_thread = Thread::new(
         scheduler::next_thread_id(),
         hello_world_thread::hello_world_thread_entry,
         false, //hier setzen welcher Ring Thread Hello World läuft Aufgabe 1
+    ); --------- old ---------
+     */
+
+    // Idle-Thread eintragen
+    let idle_thread = Thread::new(
+        idle_thread::idle_thread_entry,
+        true, //hier setzen welcher Ring Thread Idle läuft Aufgabe 1
     );
-    scheduler::Scheduler::ready(hello_world_thread);
-    */
+    scheduler::Scheduler::ready(idle_thread);
+
+    // für blatt 4 erstmal userthread ausschalten
+
+    /**/// HelloWorld-Thread eintragen
+    let hello_world_thread = Thread::new(
+        hello_world_thread::hello_world_thread_entry,
+        false, //hier setzen welcher Ring Thread Hello World läuft Aufgabe 1
+    );
+    scheduler::Scheduler::ready(hello_world_thread);/**/
 
     // Scheduler starten & Interrupts erlauben
     scheduler::Scheduler::schedule();

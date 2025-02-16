@@ -28,7 +28,10 @@ use crate::hello_world_thread::hello_world_thread_entry;
 extern "C" {
     fn _thread_kernel_start(old_rsp0: u64);
     fn _thread_user_start(old_rsp0: u64);
-    fn _thread_switch(now_rsp0: *mut u64, then_rsp0: u64, then_rsp0_end: u64);
+    
+    //fn _thread_switch(now_rsp0: *mut u64, then_rsp0: u64, then_rsp0_end: u64);
+    fn _thread_switch(now_rsp0: *mut u64, then_rsp0: u64, then_rsp0_end: u64, then_pml4: u64);
+    fn _thread_set_segment_register();
 }
 
 // Diese Funktion (setzt den Kernel-Stack im TSS) ist in 'boot.asm'
@@ -41,6 +44,7 @@ extern "C" {
 pub struct Thread {
     tid: usize,
     is_kernel_thread: bool,
+    pml4_addr: PhysAddr, // Einstieg in die Seitentabellen
     old_rsp0: u64, // letzter genutzter Stackeintrag im Kernel-Stack
     // der User-Stack-Ptr. wird auto. durch die Hardware gesichert
     //warum nicht old_rsp3?? => sie Folien "Stackaufbau bei einem Ringwechsel"
@@ -51,27 +55,37 @@ pub struct Thread {
     user_stack: Box<stack::Stack>, /// Speicher fuer den User-Stack
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
-    
     kernel_stack: Box<stack::Stack>, // Speicher fuer den Kernel-Stack
     entry: extern "C" fn(),
 }
 
 impl Thread {
     // Neuen Thread anlegen
-    pub fn new(my_tid: usize, myentry: extern "C" fn(), kernel_thread: bool) -> Box<Thread> {
+    //     pub fn new(my_tid: usize, myentry: extern "C" fn(), kernel_thread: bool) -> Box<Thread> {
+    pub fn new(myentry: extern "C" fn(), kernel_thread: bool) -> Box<Thread> {
 
+        kprintln!("{}", if kernel_thread {"Ein neuer Kernel-Thread wird erstellt....."} else {"Ein neuer User-Thread wird erstellt....."});
+//----Aufgabe X Blatt 4: Pageframes ----------------------------------------------------------------------------------------------        
+        let mytid = scheduler::next_thread_id();
+
+        // Page-Tables anlegen
+        let new_pml4_addr = pages::pg_init_kernel_tables();
+//-----------------------------------------------------------------------------------------------------------------------------------------
         // Speicher fuer die Stacks anlegen
-        let my_kernel_stack = stack::Stack::new(consts::STACK_SIZE);
+        //let my_kernel_stack = stack::Stack::new(consts::STACK_SIZE);
+        let my_kernel_stack = stack::Stack::new(consts::STACK_SIZE, true, new_pml4_addr);
 
 //----Aufgabe 3 Blatt 1: User-Stack eingebaut----------------------------------------------------------------------------------------------
         
-        let my_user_stack = stack::Stack::new(consts::STACK_SIZE);
+        //let my_user_stack = stack::Stack::new(consts::STACK_SIZE);
+        let my_user_stack = stack::Stack::new(consts::STACK_SIZE, false, new_pml4_addr);
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
         // Thread-Objekt anlegen
         let mut threadobj = Box::new(Thread {
-            tid: my_tid,
+            tid: mytid,
             is_kernel_thread: kernel_thread,
+            pml4_addr: new_pml4_addr,
             old_rsp0: 0,
             user_stack: my_user_stack,
             kernel_stack: my_kernel_stack,
@@ -89,6 +103,7 @@ impl Thread {
     pub fn start(now: *mut Thread) {
         unsafe {
             kprintln!("thread start, kernel-stack = {:x}", (*now).old_rsp0);
+            pages::pg_set_cr3(now.as_ref().unwrap().pml4_addr); // Adressraum setzen
             _thread_kernel_start((*now).old_rsp0);
         }
     }
@@ -97,20 +112,29 @@ impl Thread {
     pub fn switch(now: *mut Thread, then: *mut Thread) {
         unsafe {
             kprint!(
-                "preempt: tid={}, old_rsp0={:x}",
+                "preempt: tid={}, old_rsp0={:x}, old_pml4_addr={:x}",
                 Thread::get_tid(now),
-                (*now).old_rsp0
+                (*now).old_rsp0,
+                (*now).pml4_addr.raw()
             );
             kprintln!(
-                " and switch to tid={}, old_rsp0={:x}",
+                " and switch to tid={}, new_rsp0={:x}, new_pml4_addr={:x}",
                 Thread::get_tid(then),
-                (*then).old_rsp0
+                (*then).old_rsp0,
+                (*then).pml4_addr.raw()
             );
             _thread_switch(
                 &mut (*now).old_rsp0,
                 (*then).old_rsp0,
                 (*then).kernel_stack.stack_end() as u64,
+                (*then).pml4_addr.raw()
             );
+
+            /*_thread_switch(
+                &mut (*now).old_rsp0,
+                (*then).old_rsp0,
+                (*then).kernel_stack.stack_end() as u64
+            );*/
         }
     }
 

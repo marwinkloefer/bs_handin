@@ -290,10 +290,6 @@ impl Thread {
         unsafe { (*thread_object).tid }
     }
 
-    //pub fn get_is_kernel(thread_object: *const Thread) -> bool {
-    //    unsafe { (*thread_object).is_kernel_thread }
-    //}
-
     pub fn get_raw_pointer(&mut self) -> *mut Thread {
         self
     }
