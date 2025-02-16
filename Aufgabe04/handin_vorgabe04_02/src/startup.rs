@@ -140,7 +140,7 @@ pub extern "C" fn kmain(mbi: u64) {
     interrupts::init();
 
     // Interrupt Descriptor Table an Stelle 0x80 Trap-Gate erstellen
-    syscall_dispatcher::init();
+    //syscall_dispatcher::init();
 
     // Tastatur-Unterbrechungsroutine 'einstoepseln'
     keyboard::Keyboard::plugin();
@@ -164,6 +164,7 @@ pub extern "C" fn kmain(mbi: u64) {
     );
     scheduler::Scheduler::ready(hello_world_thread);
     */
+
     // Scheduler starten & Interrupts erlauben
     scheduler::Scheduler::schedule();
 }

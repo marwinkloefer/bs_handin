@@ -44,13 +44,17 @@ bitflags::bitflags! {
     }
 }
 
-// TODO
 // Bezügliche der Seitentabelleneinträge lassen wir vorerst alle Einträge im Ring 3 zugreifbar, löschen also nicht das User-Bit.
 // Zudem setzen wir alle Seiten auf schreibbar und sofern mit Page-Frames unterlegt auf „Präsent“.
 // Um andere mögliche Bits in den Seitentabelleneinträgen, wie Caching, No-Execute, Protection Keys etc., kümmern wir uns nicht.
 impl PTEflags {
     fn flags_for_kernel_pages() -> Self {
-        PTEflags::PRESENT | PTEflags::WRITEABLE | PTEflags::GLOBAL
+        /*
+        *   Bezügliche der Seitentabelleneinträge lassen wir vorerst alle Einträge im Ring 3 zugreifbar, löschen
+        *   also nicht das User-Bit. Das ist noch notwendig, damit wir den Code im Ring 3 ausführen können,
+        *   wird aber in einem späteren Übungsblatt abgeschafft.
+        */
+        PTEflags::PRESENT | PTEflags::WRITEABLE | PTEflags::GLOBAL | PTEflags::USER
     }
 
     fn flags_for_kernel_int_pages_user_present() -> Self {
