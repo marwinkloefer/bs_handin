@@ -52,6 +52,12 @@ _wrapper_%1:
 		mov    rdx, [rsp+16*8] ; rip
 		mov    rsi, [rsp+17*8] ; cs
 	    call    int_gpf
+	; do we have a page fault?
+	%elif %1 == 14 
+		mov    rdi, [rsp+15*8] ; error code
+		mov    rdx, [rsp+16*8] ; rip
+		mov    rsi, cr2 ; cr2
+	    call    int_pf
    %else
    	  	; pass the vector as parameter 
 		xor rax, rax

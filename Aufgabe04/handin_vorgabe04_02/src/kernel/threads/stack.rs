@@ -13,8 +13,8 @@ use core::fmt;
 use crate::consts;
 use crate::kernel::allocator;
 use crate::kernel::cpu;
-
-
+use crate::kernel::paging::frames::PhysAddr;
+use crate::kernel::paging::pages::pg_mmap_user_stack;
 
 #[repr(C)]
 pub struct Stack {

@@ -34,7 +34,11 @@ mod user;
 use alloc::boxed::Box;
 use boot::multiboot;
 use consts::KERNEL_HEAP_SIZE;
+use consts::PAGE_FRAME_SIZE;
 use consts::TEMP_HEAP_SIZE;
+use kernel::paging::frames;
+use kernel::paging::frames::PhysAddr;
+use kernel::paging::pages;
 use core::panic::PanicInfo;
 
 use devices::cga;
@@ -54,8 +58,6 @@ use kernel::threads::thread::Thread;
 use user::hello_world_thread;
 
 use crate::boot::multiboot::PhysRegion;
-use crate::kernel::paging::frames;
-use crate::consts::PAGE_FRAME_SIZE;
 
 // Konstanten im Linker-Skript
 extern "C" {
@@ -120,6 +122,10 @@ pub extern "C" fn kmain(mbi: u64) {
     // Page-Frame-Management einrichten
     frames::pf_init(&mut phys_mem);
 
+    // Paging fuer den Kernel aktivieren
+    let pml4_addr = pages::pg_init_kernel_tables();
+    kprintln!("kmain: setze CR3 auf 0x{:x}", pml4_addr.raw());
+    pages::pg_set_cr3(pml4_addr);
 
     // Kernel Heap einrichten
     kprintln!("kmain: Kernel Heap einrichten");
@@ -150,14 +156,14 @@ pub extern "C" fn kmain(mbi: u64) {
     );
     scheduler::Scheduler::ready(idle_thread);
 
-    // HelloWorld-Thread eintragen
+    /*// HelloWorld-Thread eintragen
     let hello_world_thread = Thread::new(
         scheduler::next_thread_id(),
         hello_world_thread::hello_world_thread_entry,
         false, //hier setzen welcher Ring Thread Hello World läuft Aufgabe 1
     );
     scheduler::Scheduler::ready(hello_world_thread);
-
+    */
     // Scheduler starten & Interrupts erlauben
     scheduler::Scheduler::schedule();
 }

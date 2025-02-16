@@ -204,3 +204,26 @@ pub extern "C" fn int_gpf(error_code: u64, cs: u16, rip: u64) {
     );
     loop {}
 }
+
+/** Blatt 4 Aufgabe 1
+Description:
+   Handling a page fault. Called from assembly 'interrupts.asm'
+
+Parameters: \
+   `rip`         address of the instruction which caused the PF \
+   `cs`          active 'cs' when PF occurred \
+   `error_code`  see x86 spec.
+*/
+#[no_mangle]
+pub extern "C" fn int_pf(error_code: u64, cs: u16, rip: u64) {
+    // force unlock, just to be sure
+    // anyway we do not return
+    unsafe {
+        kprint::WRITER.force_unlock();
+    }
+    kprintln!(
+        "page fault: caused by function at 0x{:x}. (error_code = 0x{:x})",
+        rip, error_code
+    );
+    loop {}
+}

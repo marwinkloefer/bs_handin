@@ -18,6 +18,8 @@ use crate::kernel::cpu;
 use crate::kernel::threads::scheduler;
 use crate::kernel::threads::stack;
 use crate::mylib::queue::Link;
+use crate::kernel::paging::frames::PhysAddr;
+use crate::kernel::paging::pages;
 
 // Test import to get Thread in Ring 3 running
 use crate::hello_world_thread::hello_world_thread_entry;
@@ -41,8 +43,8 @@ pub struct Thread {
     is_kernel_thread: bool,
     old_rsp0: u64, // letzter genutzter Stackeintrag im Kernel-Stack
     // der User-Stack-Ptr. wird auto. durch die Hardware gesichert
-    
-    
+    //warum nicht old_rsp3?? => sie Folien "Stackaufbau bei einem Ringwechsel"
+
 //----Aufgabe 3 Blatt 1: User-Stack eingebaut----------------------------------------------------------------------------------------------
     // User-Level-Threads (laufen im Ring 3) benötigen immer zwei Stacks, einen für den User- und einen für
     // den Kernel-Mode. Der Einfachheit halber allozieren wir immer zwei Stacks, auch für reine KernelThreads.
