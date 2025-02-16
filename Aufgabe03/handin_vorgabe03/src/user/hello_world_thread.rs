@@ -9,7 +9,8 @@ pub extern "C" fn hello_world_thread_entry() {
     //  let val = cpu::inb(1);
     
     /* Teste Syscalls */
-    test_syscalls(2);
+    // tests 0 and 1 in one
+    //test_syscalls(0);
 
     loop {
         print!("U");

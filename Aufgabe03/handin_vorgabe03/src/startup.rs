@@ -1,7 +1,67 @@
+/* ╔═════════════════════════════════════════════════════════════════════════╗
+   ║ Module: startup                                                         ║
+   ╟─────────────────────────────────────────────────────────────────────────╢
+   ║ Descr.: Here is the function 'kmain' called from the boot code and the  ║
+   ║         panic handler. All features are set and all modules are         ║
+   ║         imported.                                                       ║
+   ╟─────────────────────────────────────────────────────────────────────────╢
+   ║ Author: Michael Schoettner, Univ. Duesseldorf, 15.8.2023                ║
+   ╚═════════════════════════════════════════════════════════════════════════╝
+*/
+#![no_std]
+#![feature(const_mut_refs)]
+#![allow(dead_code)] // avoid warnings
+#![allow(unused_variables)] // avoid warnings
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+#![feature(alloc_error_handler)]
+#![feature(naked_functions)]
 
+extern crate alloc;
+extern crate spin; // we need a mutex in devices::cga_print
+extern crate x86;
+extern crate bitflags;
 
-// ...
+// insert other modules
+#[macro_use] // import macros, too
+mod devices;
+mod boot;
+mod consts;
+mod kernel;
+mod mylib;
+mod user;
 
+use alloc::boxed::Box;
+use boot::multiboot;
+use consts::KERNEL_HEAP_SIZE;
+use consts::TEMP_HEAP_SIZE;
+use core::panic::PanicInfo;
+
+use devices::cga;
+use devices::cga_print; // used to import code needed by println!
+use devices::keyboard; // keyboard
+use devices::kprint; // used to import code needed by kprintln!
+use devices::pit; // timer
+
+use kernel::allocator;
+use kernel::cpu;
+use kernel::interrupts;
+use kernel::syscall::syscall_dispatcher;
+use kernel::threads::idle_thread;
+use kernel::threads::scheduler;
+use kernel::threads::thread::Thread;
+
+use user::hello_world_thread;
+
+use crate::boot::multiboot::PhysRegion;
+use crate::kernel::paging::frames;
+use crate::consts::PAGE_FRAME_SIZE;
+
+// Konstanten im Linker-Skript
+extern "C" {
+    static ___KERNEL_DATA_START__: u64;
+    static ___KERNEL_DATA_END__: u64;
+}
 
 // Start- und Endadresse des Kernel-Images ermitteln,
 // aufrunden auf das naechste volle MB und zurueckgeben
@@ -37,7 +97,7 @@ fn create_temp_heap(kernel_end: usize) -> multiboot::PhysRegion {
     }
 }
 
-
+// wird in boot.asm aufgerufen mit "mbi = _multiboot_addr" als parameter
 #[no_mangle]
 pub extern "C" fn kmain(mbi: u64) {
     kprintln!("kmain");
@@ -50,21 +110,60 @@ pub extern "C" fn kmain(mbi: u64) {
     kprintln!("kmain, heap: {:?}", heap_region);
 
     // Verfuegbaren physikalischen Speicher ermitteln (exklusive Kernel-Image und Heap)
-    let phys_mem = multiboot::get_free_memory(mbi, kernel_region, heap_region);
+    let mut phys_mem = multiboot::get_free_memory(mbi, kernel_region, heap_region);
     kprintln!("kmain, free physical memory: {:?}", phys_mem);
 
     // Dump multiboot infos
+    // mbi == multiboot address 
     multiboot::dump(mbi);
 
     // Page-Frame-Management einrichten
-    frames::pf_init(phys_mem);
+    frames::pf_init(&mut phys_mem);
 
-    // Kernel Heap einrichten, nach dem Kernel-Image
-    /*
-      
-      hier muss Code eingefügt werden
-      
-     */
+
+    // Kernel Heap einrichten
+    kprintln!("kmain: Kernel Heap einrichten");
+    let kernel_heap = frames::pf_alloc(KERNEL_HEAP_SIZE.div_ceil(PAGE_FRAME_SIZE), true); // Teilen und aufrunden um 4kb alignment sicherzustellen
+    allocator::init(kernel_heap.to_start_address(), TEMP_HEAP_SIZE);
+
+    kprintln!(".... dumping ....");
+    frames::pf_dump_lists();
+    kprintln!("...........");
    
-    // ...
+    // Interrupt-Strukturen initialisieren
+    interrupts::init();
+
+    // Interrupt Descriptor Table an Stelle 0x80 Trap-Gate erstellen
+    syscall_dispatcher::init();
+
+    // Tastatur-Unterbrechungsroutine 'einstoepseln'
+    keyboard::Keyboard::plugin();
+
+    // Zeitgeber-Unterbrechungsroutine 'einstoepseln'
+    pit::plugin();
+
+    // Idle-Thread eintragen
+    let idle_thread = Thread::new(
+        scheduler::next_thread_id(),
+        idle_thread::idle_thread_entry,
+        true, //hier setzen welcher Ring Thread Idle läuft Aufgabe 1
+    );
+    scheduler::Scheduler::ready(idle_thread);
+
+    // HelloWorld-Thread eintragen
+    let hello_world_thread = Thread::new(
+        scheduler::next_thread_id(),
+        hello_world_thread::hello_world_thread_entry,
+        false, //hier setzen welcher Ring Thread Hello World läuft Aufgabe 1
+    );
+    scheduler::Scheduler::ready(hello_world_thread);
+
+    // Scheduler starten & Interrupts erlauben
+    scheduler::Scheduler::schedule();
+}
+
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    println!("Panic: {}", info);
+    loop {}
 }
